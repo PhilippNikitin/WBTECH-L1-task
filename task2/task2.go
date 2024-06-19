@@ -1,27 +1,20 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
+import "fmt"
 
+// объявляем функцию для расчета квадрата каждого числа из слайса и записи полученного значения в канал
 func Square(nums []int, ch chan int) {
-	for _, num := range nums {
-		ch <- num * num
+	for _, num := range nums { // итерируемся по циклу
+		ch <- num * num // записываем в канал квадрат каждого числа
 	}
-	close(ch)
+	close(ch) // закрываем канал, после того, как записали квадраты всех чисел из слайса
 }
 
 func main() {
-	start := time.Now()
-	defer func() {
-		fmt.Println(time.Since(start))
-	}()
-
-	ch := make(chan int, 5)
 	nums := []int{2, 4, 6, 8, 10}
-	go Square(nums, ch)
-	for square := range ch {
+	ch := make(chan int, len(nums)) // создаем буферизованный канал с емкостью, равной длине слайса
+	go Square(nums, ch)             // запускаем функцию Square в асинхронном режиме
+	for square := range ch {        // итерируемся по каналу и выводим в stdout каждое сохраненное в нем значение
 		fmt.Println(square)
 	}
 }
